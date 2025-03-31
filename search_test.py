@@ -13,8 +13,8 @@ load_dotenv()
 
 app = Flask(__name__)
 
-client_id = os.getenv('Client_id')
-client_secret = os.getenv('Client_secret')
+Client_id = os.getenv('Client_id')
+Client_id = os.getenv('Client_secret')
 
 @app.route('/', methods=['GET', 'POST'])
 def search():
