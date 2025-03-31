@@ -4,16 +4,30 @@ from openpyxl import Workbook
 from bs4 import BeautifulSoup
 import os
 from dotenv import load_dotenv
+import zipfile
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication 
+from email.mime.multipart import MIMEMultipart
 
-load_dotenv()
+dir_path = "uploads"
+all_files = os.listdir(dir_path)
+xlsx_files = []
 
 app = Flask(__name__)
 
+load_dotenv()
 client_id = os.getenv('Client_id')
 client_secret = os.getenv('Client_secret')
 
 @app.route('/', methods=['GET', 'POST'])
 def search():
+    xlsx_files = []  # 함수 안에서 리스트 초기화
+
+    for file in os.listdir(dir_path):
+        if file.endswith(".xlsx"): 
+            xlsx_files.append(file)
+
     if request.method == 'POST':
         keyword = request.form['keyword']
         count = request.form['count']
@@ -72,17 +86,48 @@ def search():
         else:
             return f"API 요청 실패: {response.status_code} - {response.text}"
 
-    return render_template('search.html')
+    return render_template('search.html', xlsx_file=xlsx_files)
 
 @app.route('/download')
 def download():
     return send_file("shopping.xlsx", as_attachment=True)
 
-#메일 보내기 함수
 @app.route('/mail')
 def mail():
+    load_dotenv()
+    send_email = os.getenv("SECRET_ID")
+    send_pwd = os.getenv("SECRET_PASS")
+    recv_email = send_email
+    file_path = "shopping.xlsx"
 
-    return ()
+    smtp = smtplib.SMTP('smtp.naver.com', 587)
+    smtp.ehlo()
+    smtp.starttls()
+
+    smtp.login(send_email,send_pwd)
+
+    text = f"검색한 결과 엑셀 파일 전송"
+
+    msg = MIMEMultipart()
+    msg['Subject'] = f"키워드 검색 결과: result.xlsx"  
+    msg['From'] = send_email          
+    msg['To'] = recv_email
+
+    contentPart = MIMEText(text) 
+    msg.attach(contentPart)     
+
+    etc_file_path = file_path
+    with open(etc_file_path, 'rb') as f : 
+        etc_part = MIMEApplication( f.read() )
+        etc_part.add_header('Content-Disposition','attachment', filename=etc_file_path)
+        msg.attach(etc_part)
+
+    email_string = msg.as_string()
+    print(email_string)
+
+    smtp.sendmail(send_email, recv_email, email_string)
+    smtp.quit()
+    return "메일 전송 완료", 200
 
 #슬랙 보내기 함수
 @app.route('/slack')

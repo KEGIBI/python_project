@@ -16,5 +16,22 @@
         
         <input type="submit" value="검색">
     </form>
+    <h2>파일 목록</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <td>파일 이름</td>
+                <td>선택</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for filename in xlsx_file %}
+                <tr>
+                    <td>{{ filename }}</td>
+                    <td><input type="checkbox" name="zipfile" id="zipfile"></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
