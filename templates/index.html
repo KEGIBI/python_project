@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>UI Layout Example</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>~~님의 장바구니</h1>
+  </header>
+
+  <section class="main-container">
+    <!-- 왼쪽: 장바구니 -->
+    <div class="cart-section">
+      <button class="cart-refresh-btn" title="새로고침">&#x21bb;</button>
+      <ul class="cart-list">
+        <li>
+          <input type="checkbox">
+          <span>상품 A</span>
+        </li>
+        <li>
+          <input type="checkbox">
+          <span>상품 B</span>
+        </li>
+        <li>
+          <input type="checkbox">
+          <span>상품 C</span>
+        </li>
+        <li>
+          <input type="checkbox">
+          <span>상품 D</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 오른쪽 위: 파일/검색 영역 -->
+    <div class="center-section">
+      <div class="search-bar">
+        <input type="text" placeholder="검색어를 입력하세요...">
+        <button class="count" title="숫자세기">&#x2B07;</button>
+        <button class="search-btn">검색</button>
+      </div>
+      <div class="file-list">
+        <label>
+          <input type="checkbox" checked>
+          <span>파일 목록1.xlsx</span>
+        </label>
+        <label>
+          <input type="checkbox" checked>
+          <span>파일 목록2.xlsx</span>
+        </label>
+        <label>
+          <input type="checkbox">
+          <span>파일 목록3.xlsx</span>
+        </label>
+      </div>
+      <div class="file-actions">
+        <button class="email-btn">이메일 전송</button>
+        <button class="file-download-btn">다운로드</button>
+      </div>
+    </div>
+
+    <!-- 오른쪽 아래: 실시간 검색어 -->
+    <aside class="keyword-section">
+      <div class="keyword-header">
+        <h3>실시간 검색어 순위</h3>
+        <form action="/" method="POST">
+          <button type="submit" class="keyword-refresh-btn" title="새로고침">&#x21bb;</button>
+        </form>
+      </div>
+      <ol class="keyword-list">
+        {% for keyword in hot_keywords %}
+          <li>{{ keyword }}</li>
+        {% endfor %}
+      </ol>
+    </aside>
+  </section>
+</body>
+</html>
