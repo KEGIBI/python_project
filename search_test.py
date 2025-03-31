@@ -37,8 +37,8 @@ def search():
 
         # API 호출 및 응답 받기
         headers = {
-            'X-Naver-Client-Id': Client_id,
-            'X-Naver-Client-Secret': Client_secret
+            'X-Naver-Client-Id': client_id,
+            'X-Naver-Client-Secret': client_secret
         }
         response = requests.get(url, headers=headers)
 
@@ -77,8 +77,8 @@ def search():
             for item in results:
                 ws.append([item['title'], item['lprice'], item['brand'], item['category'], item['link']])
 
-            # 엑셀 파일 저장
-            excel_filename = "shopping.xlsx"
+            # 엑셀 파일 저장 (키워드로 파일 이름 설정)
+            excel_filename = f"uploads/{keyword}.xlsx"
             wb.save(excel_filename)
 
             return render_template('result.html', results=results, excel_filename=excel_filename)
@@ -88,9 +88,10 @@ def search():
 
     return render_template('search.html', xlsx_file=xlsx_files)
 
-@app.route('/download')
-def download():
-    return send_file("shopping.xlsx", as_attachment=True)
+@app.route('/download/<keyword>')
+def download(keyword):
+    excel_filename = f"uploads/{keyword}.xlsx"
+    return send_file(excel_filename, as_attachment=True)
 
 @app.route('/mail')
 def mail():
@@ -134,7 +135,6 @@ def mail():
 def slack():
 
     return ()
-
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -30,7 +30,7 @@
         </tbody>
     </table>
     <br>
-    <button><a href="/download">엑셀 파일 다운로드</a></button>
+    <button><a href="{{ url_for('download', keyword=results[0].title) }}">엑셀 파일 다운로드</a></button>
     <button id="sendMailBtn"> <a href="/mail">mail 보내기</a></button>
     <button><a href="/slack"></a>slack 보내기</button>
     <br><br>
