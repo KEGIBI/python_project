@@ -37,27 +37,23 @@
     <!-- 오른쪽 위: 파일/검색 영역 -->
     <div class="center-section">
       <div class="search-bar">
-        <input type="text" placeholder="검색어를 입력하세요...">
-        <button class="count" title="숫자세기">&#x2B07;</button>
-        <button class="search-btn">검색</button>
+        <input type="text" id="keyword" name="keyword" placeholder="검색어 입력" required>
+        <input type="number" id="count" name="count" placeholder="검색 개수" required>
+        <button type="button" onclick="openSearchResults()">검색</button>
       </div>
       <div class="file-list">
-        <label>
-          <input type="checkbox" checked>
-          <span>파일 목록1.xlsx</span>
-        </label>
-        <label>
-          <input type="checkbox" checked>
-          <span>파일 목록2.xlsx</span>
-        </label>
-        <label>
-          <input type="checkbox">
-          <span>파일 목록3.xlsx</span>
-        </label>
+        {% for file in excel_files %}
+          <label>
+            <input type="checkbox" checked>
+            <span>{{ file }}</span>
+          </label><br>
+        {% endfor %}
       </div>
+      <div class="file-refresh-btn2">
+        <button type="button" title="새로고침">&#x21bb;</button>
+      </div>
+    </div>
       <div class="file-actions">
-        <button class="email-btn">이메일 전송</button>
-        <button class="file-download-btn">다운로드</button>
       </div>
     </div>
 
@@ -76,5 +72,15 @@
       </ol>
     </aside>
   </section>
+
+  <script>
+    function openSearchResults() {
+      const keyword = document.getElementById('keyword').value;
+      const count = document.getElementById('count').value;
+      const searchUrl = `/search?keyword=${encodeURIComponent(keyword)}&count=${encodeURIComponent(count)}`;
+      const newWindow = window.open(searchUrl, '_blank', 'width=800,height=600');
+    }
+  </script>
+  
 </body>
 </html>
