@@ -31,9 +31,26 @@
     </table>
     <br>
     <button><a href="/download">엑셀 파일 다운로드</a></button>
-    <button> <a href="/mail"></a>mail 보내기</button>
+    <button id="sendMailBtn"> <a href="/mail">mail 보내기</a></button>
     <button><a href="/slack"></a>slack 보내기</button>
     <br><br>
     <button><a href="/">다시 검색하기</a></button>
 </body>
 </html>
+
+<script>
+    document.getElementById('sendMailBtn').addEventListener('click', function() {
+        fetch('/mail')
+            .then(response => {
+                if (response.ok) {
+                    alert('메일이 성공적으로 전송되었습니다!');
+                } else {
+                    alert('메일 전송 실패 😢');
+                }
+            })
+            .catch(error => {
+                console.error('에러:', error);
+                alert('에러 발생!');
+            });
+    });
+    </script>

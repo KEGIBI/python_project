@@ -1,9 +1,13 @@
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, redirect, url_for
 import requests
 from openpyxl import Workbook
 from bs4 import BeautifulSoup
 import os
 from dotenv import load_dotenv
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication 
+from email.mime.multipart import MIMEMultipart
 
 load_dotenv()
 
@@ -81,8 +85,40 @@ def download():
 #메일 보내기 함수
 @app.route('/mail')
 def mail():
+    load_dotenv()
+    send_email = os.getenv("SECRET_ID")
+    send_pwd = os.getenv("SECRET_PASS")
+    recv_email = send_email
+    file_path = "shopping.xlsx"
 
-    return ()
+    smtp = smtplib.SMTP('smtp.naver.com', 587)
+    smtp.ehlo()
+    smtp.starttls()
+
+    smtp.login(send_email,send_pwd)
+
+    text = f"검색한 결과 엑셀 파일 전송"
+
+    msg = MIMEMultipart()
+    msg['Subject'] = f"키워드 검색 결과: shopping.xlsx"  
+    msg['From'] = send_email          
+    msg['To'] = recv_email
+
+    contentPart = MIMEText(text) 
+    msg.attach(contentPart)     
+
+    etc_file_path = file_path
+    with open(etc_file_path, 'rb') as f : 
+        etc_part = MIMEApplication( f.read() )
+        etc_part.add_header('Content-Disposition','attachment', filename=etc_file_path)
+        msg.attach(etc_part)
+
+    email_string = msg.as_string()
+    print(email_string)
+
+    smtp.sendmail(send_email, recv_email, email_string)
+    smtp.quit()
+    return "메일 전송 완료", 200
 
 #슬랙 보내기 함수
 @app.route('/slack')
