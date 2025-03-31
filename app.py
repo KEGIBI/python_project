@@ -1,69 +1,50 @@
-from flask import Flask, redirect, request, render_template
+from flask import Flask, render_template, request
 import requests
-from urllib.parse import urlencode
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
+import time
 
 app = Flask(__name__)
 
-# 네이버에서 발급받은 Client ID와 Client Secret
-CLIENT_ID = '3ktA9pOnQfsTwhRJErIO'
-CLIENT_SECRET = '19RY3hTp_w'
-REDIRECT_URI = 'http://localhost:5000/callback'  # Callback URL (Flask 앱에서 처리하는 URL)
+SHOPPING_URL = 'https://shopping.naver.com/ns/home#SEARCH_LAYER'
 
-# 네이버 로그인 API URL
-AUTH_URL = 'https://nid.naver.com/oauth2.0/authorize'
-TOKEN_URL = 'https://nid.naver.com/oauth2.0/token'
-USER_INFO_URL = 'https://openapi.naver.com/v1/nid/me'
+# 네이버 쇼핑에서 인기 검색어를 크롤링하는 함수
+def get_hot_keywords():
+    options = webdriver.ChromeOptions()
+    options.add_experimental_option("detach", True)  # 브라우저 창 유지
+    options.add_argument("--window-size=800,500")  
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
 
-# 네이버 쇼핑 API URL
-SHOPPING_API_URL = 'https://openapi.naver.com/v1/search/shop'
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
-# 네이버 로그인 페이지로 리디렉션 (로그인 시작)
-@app.route('/')
+    driver.get(SHOPPING_URL)
+    time.sleep(5)  # 페이지 로딩 대기
+
+    hot_keywords = []
+    
+    # 인기 검색어 크롤링 (1~10위)
+    for i in range(1, 11):
+        try:
+            keyword_element = driver.find_element(By.XPATH, f'//*[@id="gnb-search-layer"]/div/div[4]/ul/li[{i}]')
+            keyword_text = keyword_element.text.strip()
+            hot_keywords.append(keyword_text)
+        except Exception as e:
+            print(f"Error fetching rank {i}: {e}")
+
+    return hot_keywords
+
+# 기본 홈 페이지
+@app.route('/', methods=['GET', 'POST'])
 def home():
-    auth_params = {
-        'response_type': 'code',
-        'client_id': CLIENT_ID,
-        'redirect_uri': REDIRECT_URI,
-        'state': 'random_state',  # CSRF 보호를 위한 랜덤 상태 값
-    }
-    auth_url = f"{AUTH_URL}?{urlencode(auth_params)}"
-    return redirect(auth_url)
+    hot_keywords = []
+    if request.method == 'POST':
+        # POST 요청이 오면 실시간 검색어를 갱신
+        hot_keywords = get_hot_keywords()
+    return render_template('index.html', hot_keywords=hot_keywords)
 
-# 네이버 로그인 후 리디렉션된 URL을 처리 (액세스 토큰을 얻음)
-@app.route('/callback')
-def callback():
-    code = request.args.get('code')  # 네이버에서 전달받은 인증 코드
-    state = request.args.get('state')  # 네이버에서 전달받은 state 값 (보안용)
-
-    # 인증 코드로 액세스 토큰 요청
-    token_params = {
-        'grant_type': 'authorization_code',
-        'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET,
-        'code': code,
-        'state': state
-    }
-
-    # 액세스 토큰 요청
-    response = requests.post(TOKEN_URL, data=token_params)
-    token_data = response.json()
-
-    # 액세스 토큰 추출
-    access_token = token_data['access_token']
-
-    # 액세스 토큰으로 사용자 정보 요청
-    headers = {
-        'Authorization': f'Bearer {access_token}'  # 인증된 사용자의 정보 요청
-    }
-    user_info_response = requests.get(USER_INFO_URL, headers=headers)
-    user_info = user_info_response.json()
-
-
-    return render_template('shopping.html')
-
-@app.route('/shopping')
-def shopping():
-    return redirect('/callback')  # 이미 callback에서 처리되므로 별도로 /shopping에서 호출
-
+# 앱 실행
 if __name__ == '__main__':
     app.run(debug=True)
