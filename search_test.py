@@ -37,8 +37,8 @@ def search():
 
         # API 호출 및 응답 받기
         headers = {
-            'X-Naver-Client-Id': Client_id,
-            'X-Naver-Client-Secret': Client_secret
+            'X-Naver-Client-Id': client_id,
+            'X-Naver-Client-Secret': client_secret
         }
         response = requests.get(url, headers=headers)
 
