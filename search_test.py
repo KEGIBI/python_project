@@ -13,8 +13,8 @@ load_dotenv()
 
 app = Flask(__name__)
 
-client_id = 'wZ2_kTi4g4SHeG1tcVPR' # 네이버 API 클라이언트 ID
-client_secret = 'iNxPs16CuC' # 네이버 API 클라이언트 시크릿
+client_id = os.getenv('Client_id')
+client_secret = os.getenv('Client_secret')
 
 @app.route('/', methods=['GET', 'POST'])
 def search():
