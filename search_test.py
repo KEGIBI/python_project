@@ -94,13 +94,15 @@ def download(keyword):
     return send_file(excel_filename, as_attachment=True)
 
 @app.route('/mail', methods=['POST'])
-def mail():
+def mail_sender(save_path):
+    '''
+    생성된 엑셀 파일을 사용자의 이메일과 pw를 .env 파일에 저장하면 
+    지정한 메일 주소로 파일 저장 날짜와 함께 전송합니다.
+    '''
     load_dotenv()
     send_email = os.getenv("SECRET_ID")
     send_pwd = os.getenv("SECRET_PASS")
-    data = request.get_json()
-    recv_email = data.get("recv_email")
-    file_path = "shopping.xlsx"
+    recv_email = "56637@naver.com"
 
     smtp = smtplib.SMTP('smtp.naver.com', 587)
     smtp.ehlo()
@@ -108,28 +110,21 @@ def mail():
 
     smtp.login(send_email,send_pwd)
 
-    text = f"검색한 결과 엑셀 파일 전송"
-
     msg = MIMEMultipart()
-    msg['Subject'] = f"키워드 검색 결과: result.xlsx"  
+    msg['Subject'] = f"검색 결과 전송"  
     msg['From'] = send_email          
     msg['To'] = recv_email
 
-    contentPart = MIMEText(text) 
-    msg.attach(contentPart)     
-
-    etc_file_path = file_path
+    etc_file_path = save_path
     with open(etc_file_path, 'rb') as f : 
         etc_part = MIMEApplication( f.read() )
-        etc_part.add_header('Content-Disposition','attachment', filename=etc_file_path)
+        etc_part.add_header('Content-Disposition','attachment', filename= os.path.basename(save_path))
         msg.attach(etc_part)
 
     email_string = msg.as_string()
+
     smtp.sendmail(send_email, recv_email, email_string)
     smtp.quit()
-
-    return jsonify({'message': '메일 전송 완료'}), 200
-
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file, jsonify, redirect
 import requests
 from openpyxl import Workbook
 from bs4 import BeautifulSoup
@@ -11,6 +11,11 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from dotenv import load_dotenv
 import re
+import zipfile
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication 
+from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 
@@ -25,6 +30,9 @@ SHOPPING_URL = 'https://shopping.naver.com/ns/home#SEARCH_LAYER'
 
 # 결과를 저장할 폴더
 RESULT_FOLDER = 'result'
+
+# 압축 파일 저장할 폴더 
+UPLOAD_PATH = 'uploads'
 
 # 네이버 쇼핑에서 인기 검색어를 크롤링하는 함수
 def get_hot_keywords():
@@ -52,7 +60,7 @@ def get_hot_keywords():
             hot_keywords.append(keyword_clean)
         except Exception as e:
             print(f"Error fetching rank {i}: {e}")
-
+    driver.quit()
     return hot_keywords
 
 
@@ -147,6 +155,62 @@ def search():
 
     return render_template('result.html', results=results, excel_filename=excel_filename, excel_files=excel_files)
 
+# 압축과 동시에 메일 전송
+@app.route('/compress_mail', methods=['POST'])
+def compress_mail():
+    # 압축할 파일들은 RESULT_FOLDER에 있고, 압축 파일은 UPLOAD_PATH에 저장합니다.
+    # HTML에서 전달받은 체크박스 값은 name="excel_files"
+    files = request.form.getlist("excel_files")
+    if not files:
+        return "선택된 파일이 없습니다.", 400
+
+    # UPLOAD_PATH 폴더가 없으면 생성
+    if not os.path.exists(UPLOAD_PATH):
+        os.makedirs(UPLOAD_PATH, exist_ok=True)
+
+    # 압축 파일 경로 설정 (예: uploads/search_compressed.zip)
+    zip_path = os.path.join(UPLOAD_PATH, 'search_compressed.zip')
+    with zipfile.ZipFile(zip_path, 'w') as zip_file:
+        for file in files:
+            file_path = os.path.join(RESULT_FOLDER, file)
+            if os.path.exists(file_path):
+                # 압축 파일 내부에서는 파일명만 유지 (arcname=file)
+                zip_file.write(file_path, arcname=file)
+            else:
+                print(f"파일이 존재하지 않습니다: {file_path}")
+
+    # 메일 전송 기능
+    send_email = os.getenv("SECRET_ID")
+    send_pwd = os.getenv("SECRET_PASS")
+    # 수신 이메일은 고정
+    recv_email = "수신 이메일 입력"
+
+    try:
+        smtp = smtplib.SMTP('smtp.naver.com', 587)
+        smtp.ehlo()
+        smtp.starttls()
+        smtp.login(send_email, send_pwd)
+
+        msg = MIMEMultipart()
+        msg['Subject'] = "압축된 파일 전송"
+        msg['From'] = send_email
+        msg['To'] = recv_email
+
+        content_text = f"선택한 파일들을 압축하여 첨부합니다:\n{', '.join(files)}"
+        msg.attach(MIMEText(content_text, _charset='utf-8'))
+
+        with open(zip_path, 'rb') as f:
+            part = MIMEApplication(f.read())
+            part.add_header('Content-Disposition', 'attachment', filename=os.path.basename(zip_path))
+            msg.attach(part)
+
+        smtp.sendmail(send_email, recv_email, msg.as_string())
+        smtp.quit()
+    except Exception as e:
+        print(jsonify({'message': f'메일 전송 실패: {e}'}), 500)
+
+    print(jsonify({'message': '압축 및 메일 전송 완료'}), 200)
+    return redirect('/')
 
 if __name__ == '__main__':
     app.run(debug=True)
