@@ -4,10 +4,7 @@ from openpyxl import Workbook
 from bs4 import BeautifulSoup
 import os
 from dotenv import load_dotenv
-<<<<<<< HEAD
 import zipfile
-=======
->>>>>>> b2b8ba8b5da23731e4cbfae74888cc703c8cd96a
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication 
@@ -19,14 +16,9 @@ xlsx_files = []
 
 app = Flask(__name__)
 
-<<<<<<< HEAD
 load_dotenv()
 client_id = os.getenv('Client_id')
 client_secret = os.getenv('Client_secret')
-=======
-Client_id = os.getenv('Client_id')
-Client_secret = os.getenv('Client_secret')
->>>>>>> b2b8ba8b5da23731e4cbfae74888cc703c8cd96a
 
 @app.route('/', methods=['GET', 'POST'])
 def search():
@@ -117,11 +109,7 @@ def mail():
     text = f"검색한 결과 엑셀 파일 전송"
 
     msg = MIMEMultipart()
-<<<<<<< HEAD
     msg['Subject'] = f"키워드 검색 결과: result.xlsx"  
-=======
-    msg['Subject'] = f"키워드 검색 결과: shopping.xlsx"  
->>>>>>> b2b8ba8b5da23731e4cbfae74888cc703c8cd96a
     msg['From'] = send_email          
     msg['To'] = recv_email
 
