@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>검색 결과</title>
+</head>
+<body>
+    <h1>검색 결과</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>상품명</th>
+                <th>가격</th>
+                <th>브랜드</th>
+                <th>카테고리</th>
+                <th>링크</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in results %}
+            <tr>
+                <td>{{ item.title }}</td>
+                <td>{{ item.lprice }}</td>
+                <td>{{ item.brand }}</td>
+                <td>{{ item.category }}</td>
+                <td><a href="{{ item.link }}" target="_blank">보기</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <button><a href="/download">엑셀 파일 다운로드</a></button>
+    <button> <a href="/mail"></a>mail 보내기</button>
+    <button><a href="/slack"></a>slack 보내기</button>
+    <br><br>
+    <button><a href="/">다시 검색하기</a></button>
+</body>
+</html>
