@@ -16,22 +16,35 @@
         
         <input type="submit" value="검색">
     </form>
+    
     <h2>파일 목록</h2>
-    <table border="1">
-        <thead>
-            <tr>
-                <td>파일 이름</td>
-                <td>선택</td>
-            </tr>
-        </thead>
-        <tbody>
-            {% for filename in xlsx_file %}
+    <form method="POST" action="/zip">
+        <table border="1">
+            <thead>
                 <tr>
-                    <td>{{ filename }}</td>
-                    <td><input type="checkbox" name="zipfile" id="zipfile"></td>
+                    <td>파일 이름</td>
+                    <td>선택</td>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for filename in xlsx_file %}
+                    <tr>
+                        <td>{{ filename }}</td>
+                        <td><input type="checkbox" name="files" value="{{ filename }}"></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <input type="submit" value="선택한 파일 압축 다운로드">
+    </form>
+
+    <form method="POST" action="/mail_zip">
+        <input type="submit" value="선택한 파일 메일로 보내기">
+    </form>
+
+    <button id="sendMailBtn"><a href="/mail">메일 보내기</a></button>
+    <button><a href="/slack">슬랙 보내기</a></button>
+    <br>
 </body>
 </html>
