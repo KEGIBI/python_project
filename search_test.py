@@ -14,7 +14,7 @@ load_dotenv()
 app = Flask(__name__)
 
 Client_id = os.getenv('Client_id')
-Client_id = os.getenv('Client_secret')
+Client_secret = os.getenv('Client_secret')
 
 @app.route('/', methods=['GET', 'POST'])
 def search():
@@ -27,8 +27,8 @@ def search():
 
         # API 호출 및 응답 받기
         headers = {
-            'X-Naver-Client-Id': client_id,
-            'X-Naver-Client-Secret': client_secret
+            'X-Naver-Client-Id': Client_id,
+            'X-Naver-Client-Secret': Client_secret
         }
         response = requests.get(url, headers=headers)
 
