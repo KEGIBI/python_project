@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_file, redirect, url_for
+from flask import Flask, render_template, request, send_file, jsonify
 import requests
 from openpyxl import Workbook
 from bs4 import BeautifulSoup
@@ -93,12 +93,13 @@ def download(keyword):
     excel_filename = f"uploads/{keyword}.xlsx"
     return send_file(excel_filename, as_attachment=True)
 
-@app.route('/mail')
+@app.route('/mail', methods=['POST'])
 def mail():
     load_dotenv()
     send_email = os.getenv("SECRET_ID")
     send_pwd = os.getenv("SECRET_PASS")
-    recv_email = send_email
+    data = request.get_json()
+    recv_email = data.get("recv_email")
     file_path = "shopping.xlsx"
 
     smtp = smtplib.SMTP('smtp.naver.com', 587)
@@ -128,7 +129,8 @@ def mail():
 
     smtp.sendmail(send_email, recv_email, email_string)
     smtp.quit()
-    return "메일 전송 완료", 200
+
+    return jsonify({'message': '메일 전송 완료'}), 200
 
 #슬랙 보내기 함수
 @app.route('/slack')

@@ -27,10 +27,14 @@ def get_hot_keywords():
     
     # 인기 검색어 크롤링 (1~10위)
     for i in range(1, 11):
-        try:
-            keyword_element = driver.find_element(By.XPATH, f'//*[@id="gnb-search-layer"]/div/div[4]/ul/li[{i}]')
+        try: # //*[@id="gnb-search-layer"]/div/div[4]/ul/li[1]
+            keyword_element = driver.find_element(By.XPATH, f'//*[@id="gnb-search-layer"]/div/div[4]/ul/li[{i}]')                                                                                                                                               
             keyword_text = keyword_element.text.strip()
-            hot_keywords.append(keyword_text)
+            tokens = keyword_text.split()
+            # 토큰 배열의 마지막 요소만 쓰기
+            keyword_clean = tokens[-1]
+
+            hot_keywords.append(keyword_clean)
         except Exception as e:
             print(f"Error fetching rank {i}: {e}")
 
