@@ -125,18 +125,11 @@ def mail():
         msg.attach(etc_part)
 
     email_string = msg.as_string()
-    print(email_string)
-
     smtp.sendmail(send_email, recv_email, email_string)
     smtp.quit()
 
     return jsonify({'message': '메일 전송 완료'}), 200
 
-#슬랙 보내기 함수
-@app.route('/slack')
-def slack():
-
-    return ()
 
 if __name__ == '__main__':
     app.run(debug=True)

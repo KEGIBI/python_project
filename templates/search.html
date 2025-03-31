@@ -18,7 +18,7 @@
     </form>
     
     <h2>파일 목록</h2>
-    <form method="POST" action="/zip">
+    <form id="fileForm">
         <table border="1">
             <thead>
                 <tr>
@@ -36,15 +36,86 @@
             </tbody>
         </table>
         <br>
-        <input type="submit" value="선택한 파일 압축 다운로드">
-    </form>
+        <input type="email" id="userEmail" placeholder="이메일 입력" required>
+        <button type="button" id="sendMailBtn">선택 파일 메일 보내기</button>
 
-    <form method="POST" action="/mail_zip">
-        <input type="submit" value="선택한 파일 메일로 보내기">
+        <button type="button" id="downloadZipBtn">선택 파일 다운로드</button>
     </form>
-
-    <button id="sendMailBtn"><a href="/mail">메일 보내기</a></button>
-    <button><a href="/slack">슬랙 보내기</a></button>
     <br>
+    <button><a href="/">다시 검색하기</a></button>
+
+    <script>
+        //메일 보내기
+        document.getElementById('sendMailBtn').addEventListener('click', function() {
+            const email = document.getElementById('userEmail').value;
+            const checkboxes = document.querySelectorAll('input[name="files"]:checked');
+            const selectedFiles = Array.from(checkboxes).map(cb => cb.value);
+
+            if (selectedFiles.length === 0) {
+                alert('파일을 선택하세요.');
+                return;
+            }
+
+            fetch('/mail_zip', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ recv_email: email, files: selectedFiles })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('메일이 성공적으로 전송되었습니다!');
+                } else {
+                    alert('메일 전송 실패 😢');
+                }
+            })
+            .catch(error => {
+                console.error('에러:', error);
+                alert('에러 발생!');
+            });
+        });
+
+        //파일 압축 후 다운로드
+        document.getElementById('downloadZipBtn').addEventListener('click', function() {
+            const checkboxes = document.querySelectorAll('input[name="files"]:checked');
+            const selectedFiles = Array.from(checkboxes).map(cb => cb.value);
+
+            if (selectedFiles.length === 0) {
+                alert('파일을 선택하세요.');
+                return;
+            }
+
+            fetch('/download_zip', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ files: selectedFiles })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                } else {
+                    alert('압축 파일 생성 실패');
+                }
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'selected_files.zip'; // 다운로드할 파일 이름
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                alert('압축 파일 다운로드 시작');
+            })
+            .catch(error => {
+                console.error('에러:', error);
+                alert('에러 발생!');
+            });
+        });
+    </script>
 </body>
 </html>
