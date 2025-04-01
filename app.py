@@ -23,6 +23,7 @@ from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 
+
 # .env 파일에서 클라이언트 아이디와 시크릿을 불러오기
 load_dotenv()
 
@@ -214,7 +215,9 @@ def cart():
 
     return render_template('index.html', name = name, items=items)
 
-
+@app.route('/refresh', methods=['POST'])
+def refresh():
+    return redirect('/cart')
 
 @app.route('/search', methods=['GET'])
 def search():
@@ -227,7 +230,7 @@ def search():
     # result 폴더에서 파일 목록 가져오기
     excel_files = os.listdir(RESULT_FOLDER)
 
-    return render_template('result.html', results=results, excel_filename=excel_filename, excel_files=excel_files)
+    return render_template('result.html', results=results, excel_filename=excel_filename, excel_files=excel_files, keyword = keyword)
 
 
 

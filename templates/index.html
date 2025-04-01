@@ -8,40 +8,30 @@
 <body>
   <header>
     <h1><b>{{name}}</b>님의 장바구니</h1>
-    {% for title, price, img_url in items %}
-    <div class="item">
-        <img src="{{ img_url }}" alt="상품 이미지">
-        <div class="info">
-            <div class="title">{{ title }}</div>
-            <div class="price">{{ price }}</div>
-        </div>
-    </div>
-    {% endfor %}
-
     <img src="/static/logo.png" alt="로고" class="header-logo">
   </header>
   
   <section class="main-container">
     <!-- 왼쪽: 장바구니 -->
     <div class="cart-section">
-      <button class="cart-refresh-btn" title="새로고침">&#x21bb;</button>
+      <form method="POST" action="/refresh">
+        <button class="cart-refresh-btn" title="새로고침">&#x21bb;</button>
+      </form>
       <ul class="cart-list">
-        <li>
-          <input type="checkbox">
-          <span>상품 A</span>
-        </li>
-        <li>
-          <input type="checkbox">
-          <span>상품 B</span>
-        </li>
-        <li>
-          <input type="checkbox">
-          <span>상품 C</span>
-        </li>
-        <li>
-          <input type="checkbox">
-          <span>상품 D</span>
-        </li>
+        {% for title, price, img_url in items %}
+          <li class="cart-item">
+            <label>
+              <input type="checkbox" class="cart-checkbox">
+              <div class="item">
+                <img src="{{ img_url }}" alt="상품 이미지" class="cart-image">
+                <div class="info">
+                  <div class="title">{{ title }}</div>
+                  <div class="price">{{ price }}</div>
+                </div>
+              </div>
+            </label>
+          </li>
+        {% endfor %}
       </ul>
     </div>
 
