@@ -17,18 +17,22 @@
   header {
     display: flex;
     align-items: center;
+    justify-content: space-between; /* 좌우 정렬 */
     background: #ffffff;
     padding: 1rem;
     border-bottom: 1px solid #ddd;
   }
   
+  .header-logo {
+    height: 50px; /* 로고 크기 조정 */
+    margin-left: 1rem;
+  }
+
   header h1 {
     flex-grow: 1;
     font-size: 1.4rem;
     margin-left: 1rem;
   }
-
-
   .cart-refresh-btn {
     border: none;
     background: #eee;
@@ -158,15 +162,19 @@
     flex: 1;
     font-size: 1.1rem;
   }
-  .keyword-list li {
-    margin: 0.5rem 20px;
-  }
-  .keyword-list .rank {
-    display: inline-block;
-    width: 1.5rem;
-    font-weight: bold;
-    color: #d00; 
-    text-align: right;
-    margin-right: 0.5rem;
+  .keyword-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
   }
   
+  .keyword-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: calc(50% - 0.5rem); /* 두 개의 열로 정렬 */
+  }
+  
+  .keyword-list li {
+    margin: 0.3rem 0;
+  }
