@@ -215,6 +215,7 @@ def cart():
 
     return render_template('index.html', name = name, items=items)
 
+
 @app.route('/refresh', methods=['POST'])
 def refresh():
     return redirect('/cart')

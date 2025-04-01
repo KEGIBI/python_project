@@ -60,6 +60,7 @@
     </div>
 
     <!-- 오른쪽 아래: 실시간 검색어 -->
+    
     <aside class="keyword-section">
       <div class="keyword-header">
         <h3>실시간 검색어 순위</h3>
@@ -68,6 +69,7 @@
         </form>
       </div>
       <div class="keyword-container">
+        {% if hot_keywords %}
         <ol class="keyword-list">
           {% for keyword in hot_keywords[:5] %}
             <li>{{ loop.index }}. {{ keyword }}</li>
@@ -78,7 +80,10 @@
             <li>{{ loop.index + 5 }}. {{ keyword }}</li>
           {% endfor %}
         </ol>
+        {% endif %}
       </div>
+      </aside>
+  
   </section>
 
   <script>
