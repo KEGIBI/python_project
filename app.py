@@ -21,6 +21,10 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication 
 from email.mime.multipart import MIMEMultipart
 
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+
+
 app = Flask(__name__)
 
 # .env 파일에서 클라이언트 아이디와 시크릿을 불러오기
@@ -292,6 +296,54 @@ def compress_mail():
 
     print(jsonify({'message': '압축 및 메일 전송 완료'}), 200)
     return redirect('/')
+
+
+@app.route('/compress_slack', methods=['POST'])
+def compress_slack():
+    # 압축할 파일들은 RESULT_FOLDER에 있고, 압축 파일은 UPLOAD_PATH에 저장합니다.
+    # HTML에서 전달받은 체크박스 값은 name="excel_files"
+    files = request.form.getlist("excel_files")
+    if not files:
+        return "선택된 파일이 없습니다.", 400
+
+    # UPLOAD_PATH 폴더가 없으면 생성
+    if not os.path.exists(UPLOAD_PATH):
+        os.makedirs(UPLOAD_PATH, exist_ok=True)
+
+    # 압축 파일 경로 설정 (예: uploads/search_compressed.zip)
+    zip_path = os.path.join(UPLOAD_PATH, 'search_compressed.zip')
+    with zipfile.ZipFile(zip_path, 'w') as zip_file:
+        for file in files:
+            file_path = os.path.join(RESULT_FOLDER, file)
+            if os.path.exists(file_path):
+                # 압축 파일 내부에서는 파일명만 유지 (arcname=file)
+                zip_file.write(file_path, arcname=file)
+            else:
+                print(f"파일이 존재하지 않습니다: {file_path}")
+
+    # slack 전송 기능
+    SLACK_API_TOKEN = os.getenv("SLACK_API_TOKEN")
+    SLACK_CHANNEL = os.getenv("SLACK_CHANNEL")
+    msg = f"압축된 파일 전송\n\n"
+    msg += f"선택한 파일들을 압축하여 첨부합니다:\n{', '.join(files)}"
+
+    # WebClient 인스턴스 생성
+    client = WebClient(token=SLACK_API_TOKEN)
+    try:
+        # 파일을 Slack 채널에 업로드하고, 해당 파일에 메시지를 추가합니다.
+        response = client.files_upload_v2(
+            channel=SLACK_CHANNEL, 
+            file=zip_path,
+            initial_comment=msg
+        )
+        # 업로드 성공 메시지 출력
+        print("File uploaded successfully:", response["file"]["name"])
+    except SlackApiError as e:
+        # 에러 처리
+        print("Error uploading file:", e.response["error"])
+    return redirect('/')
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
