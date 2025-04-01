@@ -42,18 +42,19 @@
         <input type="number" id="count" name="count" placeholder="검색 개수" required>
         <button type="button" onclick="openSearchResults()">검색</button>
       </div>
-          <!-- 파일 목록 -->
-        <form id="mailForm" action="/compress_mail" method="POST">
-        <div class="file-list">
-          {% for file in excel_files %}
-            <label>
-              <input type="checkbox" name="excel_files" value="{{ file }}">
-              {{ file }}
-            </label><br>
-          {% endfor %}
-        </div>
-        <button type="submit">압축 & 메일 전송</button>
-      </form>
+        <!-- 파일 목록 -->
+        <form id="mailForm" method="POST">
+          <div class="file-list">
+            {% for file in excel_files %}
+              <label>
+                <input type="checkbox" name="excel_files" value="{{ file }}">
+                {{ file }}
+              </label><br>
+            {% endfor %}
+          </div>
+          <button type="submit" onclick="submitForm('/compress_mail')">압축 & 메일 전송</button>
+          <button type="submit" onclick="submitForm('/compress_slack')">압축 & 슬랙 전송</button>
+        </form>
     </div>
       <div class="file-actions">
       </div>
@@ -96,6 +97,10 @@
       setTimeout(() => {
         window.location.reload();
       }, 1000);
+    }
+    function submitForm(actionUrl) {
+      const form = document.getElementById('mailForm');
+      form.action = actionUrl;
     }
   </script>
   
