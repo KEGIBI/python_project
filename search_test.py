@@ -93,40 +93,65 @@ def download(keyword):
     excel_filename = f"uploads/{keyword}.xlsx"
     return send_file(excel_filename, as_attachment=True)
 
-@app.route('/mail', methods=['POST'])
-def mail():
+@app.route('/download_zip', methods=['POST'])
+def download_zip():
+    data = request.get_json()
+    files = data.get("files")
+
+    # 압축 파일 생성
+    zip_filename = "uploads/selected_files.zip"
+    with zipfile.ZipFile(zip_filename, 'w') as zipf:
+        for file in files:
+            file_path = os.path.join(dir_path, file)
+            zipf.write(file_path, arcname=file)  # arcname을 사용하여 파일 이름만 포함
+
+    return send_file(zip_filename, as_attachment=True)
+
+
+
+@app.route('/mail_zip', methods=['POST'])
+def mail_zip():
     load_dotenv()
     send_email = os.getenv("SECRET_ID")
     send_pwd = os.getenv("SECRET_PASS")
     data = request.get_json()
     recv_email = data.get("recv_email")
-    file_path = "shopping.xlsx"
+    files = data.get("files")
+
+    # 압축 파일 생성
+    zip_filename = "selected_files.zip"
+    with zipfile.ZipFile(zip_filename, 'w') as zipf:
+        for file in files:
+            file_path = os.path.join(dir_path, file)
+            zipf.write(file_path, arcname=file)  # arcname을 사용하여 파일 이름만 포함
 
     smtp = smtplib.SMTP('smtp.naver.com', 587)
     smtp.ehlo()
     smtp.starttls()
+    smtp.login(send_email, send_pwd)
 
-    smtp.login(send_email,send_pwd)
-
-    text = f"검색한 결과 엑셀 파일 전송"
+    text = "선택한 파일을 압축하여 전송합니다."
 
     msg = MIMEMultipart()
-    msg['Subject'] = f"키워드 검색 결과: result.xlsx"  
+    msg['Subject'] = "선택한 파일 전송"
     msg['From'] = send_email          
     msg['To'] = recv_email
 
     contentPart = MIMEText(text) 
     msg.attach(contentPart)     
 
-    etc_file_path = file_path
-    with open(etc_file_path, 'rb') as f : 
-        etc_part = MIMEApplication( f.read() )
-        etc_part.add_header('Content-Disposition','attachment', filename=etc_file_path)
-        msg.attach(etc_part)
+    # 압축 파일 첨부
+    with open(zip_filename, 'rb') as f:
+        zip_part = MIMEApplication(f.read())
+        zip_part.add_header('Content-Disposition', 'attachment', filename=zip_filename)
+        msg.attach(zip_part)
 
     email_string = msg.as_string()
     smtp.sendmail(send_email, recv_email, email_string)
     smtp.quit()
+
+    # 생성한 압축 파일 삭제 (선택 사항)
+    os.remove(zip_filename)
 
     return jsonify({'message': '메일 전송 완료'}), 200
 
