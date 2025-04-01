@@ -77,11 +77,18 @@
           <button type="submit" class="keyword-refresh-btn" title="새로고침">&#x21bb;</button>
         </form>
       </div>
-      <ol class="keyword-list">
-        {% for keyword in hot_keywords %}
-          <li>{{ keyword }}</li>
-        {% endfor %}
-      </ol>
+      <div class="keyword-container">
+        <ol class="keyword-list">
+          {% for keyword in hot_keywords[:5] %}
+            <li>{{ loop.index }}. {{ keyword }}</li>
+          {% endfor %}
+        </ol>
+        <ol class="keyword-list">
+          {% for keyword in hot_keywords[5:] %}
+            <li>{{ loop.index + 5 }}. {{ keyword }}</li>
+          {% endfor %}
+        </ol>
+      </div>
     </aside>
   </section>
 
