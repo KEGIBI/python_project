@@ -93,6 +93,7 @@ def download(keyword):
     excel_filename = f"uploads/{keyword}.xlsx"
     return send_file(excel_filename, as_attachment=True)
 
+<<<<<<< HEAD
 @app.route('/download_zip', methods=['POST'])
 def download_zip():
     data = request.get_json()
@@ -124,12 +125,25 @@ def mail_zip():
         for file in files:
             file_path = os.path.join(dir_path, file)
             zipf.write(file_path, arcname=file)  # arcname을 사용하여 파일 이름만 포함
+=======
+@app.route('/mail', methods=['POST'])
+def mail_sender(save_path):
+    '''
+    생성된 엑셀 파일을 사용자의 이메일과 pw를 .env 파일에 저장하면 
+    지정한 메일 주소로 파일 저장 날짜와 함께 전송합니다.
+    '''
+    load_dotenv()
+    send_email = os.getenv("SECRET_ID")
+    send_pwd = os.getenv("SECRET_PASS")
+    recv_email = "56637@naver.com"
+>>>>>>> bfd47fbe05110ca155be59bfacf8a8d24650e9bf
 
     smtp = smtplib.SMTP('smtp.naver.com', 587)
     smtp.ehlo()
     smtp.starttls()
     smtp.login(send_email, send_pwd)
 
+<<<<<<< HEAD
     text = "선택한 파일을 압축하여 전송합니다."
 
     msg = MIMEMultipart()
@@ -145,16 +159,34 @@ def mail_zip():
         zip_part = MIMEApplication(f.read())
         zip_part.add_header('Content-Disposition', 'attachment', filename=zip_filename)
         msg.attach(zip_part)
+=======
+    smtp.login(send_email,send_pwd)
+
+    msg = MIMEMultipart()
+    msg['Subject'] = f"검색 결과 전송"  
+    msg['From'] = send_email          
+    msg['To'] = recv_email
+
+    etc_file_path = save_path
+    with open(etc_file_path, 'rb') as f : 
+        etc_part = MIMEApplication( f.read() )
+        etc_part.add_header('Content-Disposition','attachment', filename= os.path.basename(save_path))
+        msg.attach(etc_part)
+>>>>>>> bfd47fbe05110ca155be59bfacf8a8d24650e9bf
 
     email_string = msg.as_string()
+
     smtp.sendmail(send_email, recv_email, email_string)
     smtp.quit()
 
+<<<<<<< HEAD
     # 생성한 압축 파일 삭제 (선택 사항)
     os.remove(zip_filename)
 
     return jsonify({'message': '메일 전송 완료'}), 200
 
 
+=======
+>>>>>>> bfd47fbe05110ca155be59bfacf8a8d24650e9bf
 if __name__ == '__main__':
     app.run(debug=True)

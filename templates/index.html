@@ -41,17 +41,18 @@
         <input type="number" id="count" name="count" placeholder="검색 개수" required>
         <button type="button" onclick="openSearchResults()">검색</button>
       </div>
-      <div class="file-list">
-        {% for file in excel_files %}
-          <label>
-            <input type="checkbox" checked>
-            <span>{{ file }}</span>
-          </label><br>
-        {% endfor %}
-      </div>
-      <div class="file-refresh-btn2">
-        <button type="button" title="새로고침">&#x21bb;</button>
-      </div>
+          <!-- 파일 목록 -->
+        <form id="mailForm" action="/compress_mail" method="POST">
+        <div class="file-list">
+          {% for file in excel_files %}
+            <label>
+              <input type="checkbox" name="excel_files" value="{{ file }}">
+              {{ file }}
+            </label><br>
+          {% endfor %}
+        </div>
+        <button type="submit">압축 & 메일 전송</button>
+      </form>
     </div>
       <div class="file-actions">
       </div>
@@ -79,6 +80,10 @@
       const count = document.getElementById('count').value;
       const searchUrl = `/search?keyword=${encodeURIComponent(keyword)}&count=${encodeURIComponent(count)}`;
       const newWindow = window.open(searchUrl, '_blank', 'width=800,height=600');
+      // 1~2초 뒤 현재 페이지 새로고침
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     }
   </script>
   
