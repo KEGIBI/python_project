@@ -147,7 +147,12 @@ def home():
     return render_template('index.html', hot_keywords=hot_keywords, excel_files=excel_files)
 
 
-@app.route('/cart')
+@app.route('/refresh', methods=['POST'])
+def refresh():
+    return redirect('/cart')
+
+
+@app.route('/cart', methods = ['GET', 'POST'])
 def cart():
     # 1단계: 크롬창 열기
     options = Options()

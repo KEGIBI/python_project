@@ -22,7 +22,9 @@
   <section class="main-container">
     <!-- 왼쪽: 장바구니 -->
     <div class="cart-section">
-      <button class="cart-refresh-btn" title="새로고침">&#x21bb;</button>
+      <form method="POST" action="/refresh">
+        <button class="cart-refresh-btn" title="새로고침">&#x21bb;</button>
+      </form>
       <ul class="cart-list">
         <li>
           <input type="checkbox">
