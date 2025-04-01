@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>장바구니</title>
+    <style>
+        .item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+        .item img {
+            width: 100px;
+            height: auto;
+            margin-right: 20px;
+        }
+        .item .info {
+            font-size: 16px;
+        }
+        .item .price {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🛒 네이버 장바구니</h1>
+    {% for title, price, img_url in items %}
+    <div class="item">
+        <img src="{{ img_url }}" alt="상품 이미지">
+        <div class="info">
+            <div class="title">{{ title }}</div>
+            <div class="price">{{ price }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</body>
+</html>
