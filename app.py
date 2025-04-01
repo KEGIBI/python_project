@@ -157,6 +157,7 @@ def cart():
     # 1단계: 크롬창 열기
     options = Options()
     options.add_experimental_option("detach", False)  # 자동 창 종료
+    options.add_argument("--window-size=1200,600")  
     driver = webdriver.Chrome(options=options)
 
     # 2단계: 네이버 로그인 페이지 접속
@@ -194,6 +195,9 @@ def cart():
     driver.quit()
 
     soup = BeautifulSoup(shopping_html, 'html.parser')
+
+    name = soup.select_one('#gnb_name1').text # 이름 받아오기
+    
     titles = [div.get_text(strip=True) for div in soup.select("div[class^='title']")]
     titles = [title.replace("네이버플러스멤버십", "") for title in titles]
 
@@ -206,15 +210,14 @@ def cart():
     image_urls = [img['src'] for img in soup.select("img[src^='https://shop-phinf.pstatic.net']")]
 
     
-    items = list(zip(titles, prices, image_urls)) # 짝 맞추기
-    print("items 출력 확인:", items)
 
+    items = list(zip(titles, prices, image_urls)) # 짝 맞추기
 
     print("🛍 추출된 장바구니 목록:")
     for t, p, q in items:
         print(f"{t}: {p}, img : {q}")
 
-    return render_template('index.html', items=items)
+    return render_template('index.html', name = name, items=items)
 
 
 
