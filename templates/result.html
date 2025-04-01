@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/result.css">
     <title>검색 결과</title>
 </head>
 <body>
-    <h1>검색 결과</h1>
-    <table border="1">
+    <h1> {{ keyword }}의 검색 결과</h1>
+    <table border="2">
         <thead>
             <tr>
                 <th>상품명</th>
@@ -21,7 +22,7 @@
             {% for item in results %}
             <tr>
                 <td>{{ item.title }}</td>
-                <td>{{ item.lprice }}</td>
+                <td>{{ item.lprice }}원</td>
                 <td>{{ item.brand }}</td>
                 <td>{{ item.category }}</td>
                 <td><a href="{{ item.link }}" target="_blank">보기</a></td>
@@ -30,22 +31,6 @@
         </tbody>
     </table>
     <br>
-    <br>
-</body>
+
 </html>
 
-<script>
-    document.getElementById('sendMailBtn').addEventListener('click', function() {
-        fetch('/mail')
-            .then(response => {
-                if (response.ok) {
-                    alert('메일이 성공적으로 전송되었습니다!');
-                } else {
-                    alert('메일 전송 실패 😢');
-                }
-            })
-            .catch(error => {
-                console.error('에러:', error);
-                alert('에러 발생!');
-            });
-    });

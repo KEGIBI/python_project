@@ -17,17 +17,13 @@
         </div>
     </div>
     {% endfor %}
-
-    <img src="/static/logo.png" alt="로고" class="header-logo">
   </header>
   
 
   <section class="main-container">
     <!-- 왼쪽: 장바구니 -->
     <div class="cart-section">
-      <form method="POST" action="/refresh">
-        <button class="cart-refresh-btn" title="새로고침">&#x21bb;</button>
-      </form>
+      <button class="cart-refresh-btn" title="새로고침">&#x21bb;</button>
       <ul class="cart-list">
         <li>
           <input type="checkbox">
@@ -56,18 +52,17 @@
         <button type="button" onclick="openSearchResults()">검색</button>
       </div>
           <!-- 파일 목록 -->
-        <form id="mailForm" method="POST">
-          <div class="file-list">
-            {% for file in excel_files %}
-              <label>
-                <input type="checkbox" name="excel_files" value="{{ file }}">
-                {{ file }}
-              </label><br>
-            {% endfor %}
-          </div>
-          <button type="submit" onclick="submitForm('/compress_mail')">압축 & 메일 전송</button>
-          <button type="submit" onclick="submitForm('/compress_slack')">압축 & 슬랙 전송</button>
-        </form>
+        <form id="mailForm" action="/compress_mail" method="POST">
+        <div class="file-list">
+          {% for file in excel_files %}
+            <label>
+              <input type="checkbox" name="excel_files" value="{{ file }}">
+              {{ file }}
+            </label><br>
+          {% endfor %}
+        </div>
+        <button type="submit">압축 & 메일 전송</button>
+      </form>
     </div>
       <div class="file-actions">
       </div>
@@ -105,11 +100,6 @@
       setTimeout(() => {
         window.location.reload();
       }, 1000);
-    }
-
-     function submitForm(actionUrl) {
-      const form = document.getElementById('mailForm');
-      form.action = actionUrl;
     }
   </script>
   
